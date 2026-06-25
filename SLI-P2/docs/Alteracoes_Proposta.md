@@ -1,0 +1,11 @@
+# Relatório de Desvios e Evolução face à Proposta Inicial
+
+O desenvolvimento prático do sistema **SLI** tomou como base as especificações arquiteturais definidas no plano original. No entanto, durante as fases de codificação e desenho da interface gráfica (WPF), foram executados ajustamentos de escopo fundamentados em critérios de viabilidade operacional, usabilidade e cumprimento dos prazos académicos.
+
+A matriz abaixo sistematiza de forma direta e comparativa os desvios de escopo e as evoluções registadas entre a conceção inicial e o produto final:
+
+| Componente / Eixo | Especificação Original (Antes) | Implementação Concreta (Depois) | Justificação Técnica e Impacto |
+| :--- | :--- | :--- | :--- |
+| **Eixo de Contactos** | Implementação visual e operações CRUD completas na interface gráfica para as entidades `Contacto`, `Comprador` e `Vendedor`. | Integração e mapeamento completo das classes na camada de lógica de negócio (Core), com a sua manipulação direta secundarizada na interface gráfica. | Centralização de esforços no motor fiscal do sistema, garantindo uma validação robusta e exaustiva dos cenários de teste de impostos sem dispersão de escopo na UI. |
+| **Gestão Documental (DAV)** | Previsão estrita da relação estrutural de composição em memória (1:N) entre as entidades `Veiculo` e `Documento`. | Inclusão de um mecanismo de interação na interface que permite selecionar um registo na `ListView` e acionar a abertura direta do PDF correspondente. | Execução baseada na classe `System.Diagnostics.Process` com `UseShellExecute = true`. Realiza a ponte com o visualizador nativo do S.O. sem acoplar dependências externas de terceiros ao projeto WPF. |
+| **Domínio de Veículos** | O planeamento focava-se essencialmente na distinção de automóveis ligeiros (Elétricos Puros, Híbridos Plug-In e a Combustão). | A estrutura de herança derivada da classe abstrata `Veiculo` foi estendida para suportar nativamente a categoria de `Motociclo`. | Demonstração prática da extensibilidade do design de software. A introdução duma tipologia com regras fiscais distintas provou a resiliência do motor polimórfico sem necessidade de alterar a superclasse. |

@@ -18,7 +18,8 @@ namespace SLI_P2
     public partial class MainWindow : Window
     {
         private SliHelper _helper = new SliHelper();
-        private Veiculo? _veiculoSelecionado = null;
+        private Veiculo _veiculoSelecionado = null;
+        private string _caminhoDavSelecionado = string.Empty;
 
         public MainWindow()
         {
@@ -29,9 +30,6 @@ namespace SLI_P2
 
         private void cbTipoVeiculo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //if (panelCilindrada == null || panelAmbiental == null || panelHibrido == null || panelEletrico == null || cbTipoCombustivel == null) return;
-
-            // 1. Atualizar opções de combustíveis dinamicamente
             cbTipoCombustivel.Items.Clear();
             switch (cbTipoVeiculo.SelectedIndex)
             {
@@ -54,11 +52,49 @@ namespace SLI_P2
             }
             cbTipoCombustivel.SelectedIndex = 0;
 
-            // 2. Controlar visibilidade dos painéis do formulário
-            panelCilindrada.Visibility = cbTipoVeiculo.SelectedIndex == 1 ? Visibility.Collapsed : Visibility.Visible;
-            panelAmbiental.Visibility = (cbTipoVeiculo.SelectedIndex == 0 || cbTipoVeiculo.SelectedIndex == 2) ? Visibility.Visible : Visibility.Collapsed;
-            panelHibrido.Visibility = cbTipoVeiculo.SelectedIndex == 2 ? Visibility.Visible : Visibility.Collapsed;
-            panelEletrico.Visibility = cbTipoVeiculo.SelectedIndex == 1 ? Visibility.Visible : Visibility.Collapsed;
+            if (cbTipoVeiculo.SelectedIndex == 1)
+            {
+                panelCilindrada.Visibility = Visibility.Collapsed;
+                panelEletrico.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                panelCilindrada.Visibility = Visibility.Visible;
+                panelEletrico.Visibility = Visibility.Collapsed;
+            }
+
+            if (cbTipoVeiculo.SelectedIndex == 0 || cbTipoVeiculo.SelectedIndex == 2)
+            {
+                panelAmbiental.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                panelAmbiental.Visibility = Visibility.Collapsed;
+            }
+
+            if (cbTipoVeiculo.SelectedIndex == 2)
+            {
+                panelHibrido.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                panelHibrido.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        // Método para o botão de selecionar o ficheiro PDF (Anexar DAV)
+        private void btnAnexarDav_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog janelaFicheiro = new Microsoft.Win32.OpenFileDialog();
+            janelaFicheiro.Filter = "Documentos PDF (*.pdf)|*.pdf";
+            janelaFicheiro.Title = "Selecionar PDF da DAV";
+
+            if (janelaFicheiro.ShowDialog() == true)
+            {
+                _caminhoDavSelecionado = janelaFicheiro.FileName;
+                lblCaminhoDav.Text = janelaFicheiro.SafeFileName;
+                btnVerPdf.IsEnabled = true;
+            }
         }
 
         private void btnAdicionar_Click(object sender, RoutedEventArgs e)
@@ -82,13 +118,21 @@ namespace SLI_P2
 
                 if (_veiculoSelecionado == null)
                 {
-                    novoVeiculo = cbTipoVeiculo.SelectedIndex switch
+                    switch (cbTipoVeiculo.SelectedIndex)
                     {
-                        0 => new VeiculoCombustao(),
-                        1 => new VeiculoEletrico(),
-                        2 => new VeiculoHibridoPlugin(),
-                        _ => new VeiculoMotociclo()
-                    };
+                        case 0:
+                            novoVeiculo = new VeiculoCombustao();
+                            break;
+                        case 1:
+                            novoVeiculo = new VeiculoEletrico();
+                            break;
+                        case 2:
+                            novoVeiculo = new VeiculoHibridoPlugin();
+                            break;
+                        default:
+                            novoVeiculo = new VeiculoMotociclo();
+                            break;
+                    }
                 }
                 else
                 {
@@ -99,19 +143,38 @@ namespace SLI_P2
                 novoVeiculo.Modelo = txtModelo.Text;
                 novoVeiculo.Vin = txtVin.Text;
                 novoVeiculo.Ano = ano;
-                novoVeiculo.TipoCombustivel = cbTipoCombustivel.SelectedItem?.ToString() ?? "Gasolina";
+
+                if (cbTipoCombustivel.SelectedItem != null)
+                {
+                    novoVeiculo.TipoCombustivel = cbTipoCombustivel.SelectedItem.ToString();
+                }
+                else
+                {
+                    novoVeiculo.TipoCombustivel = "Gasolina";
+                }
+
                 novoVeiculo.PrecoBase = precoBase;
                 novoVeiculo.CustosTransporte = transporte;
-                novoVeiculo.IsImportacaoUe = chkIsImportacaoUe.IsChecked ?? true;
 
-                // Mapeamento específico por tipo
-                if (novoVeiculo is VeiculoMotociclo mota)
+                if (chkIsImportacaoUe.IsChecked != null)
                 {
+                    novoVeiculo.IsImportacaoUe = chkIsImportacaoUe.IsChecked.Value;
+                }
+                else
+                {
+                    novoVeiculo.IsImportacaoUe = true;
+                }
+
+                // Configuração de campos por tipo (Cast clássico)
+                if (novoVeiculo is VeiculoMotociclo)
+                {
+                    VeiculoMotociclo mota = (VeiculoMotociclo)novoVeiculo;
                     int.TryParse(txtCilindrada.Text, out int cc);
                     mota.Cilindrada = cc;
                 }
-                else if (novoVeiculo is VeiculoCombustao combustao)
+                else if (novoVeiculo is VeiculoCombustao)
                 {
+                    VeiculoCombustao combustao = (VeiculoCombustao)novoVeiculo;
                     int.TryParse(txtCilindrada.Text, out int cc);
                     int.TryParse(txtCO2.Text, out int co2);
                     double.TryParse(txtParticulas.Text, out double part);
@@ -120,20 +183,40 @@ namespace SLI_P2
                     combustao.EmissoesCO2 = co2;
                     combustao.Particulas = part;
 
-                    if (novoVeiculo is VeiculoHibridoPlugin hibrido)
+                    if (novoVeiculo is VeiculoHibridoPlugin)
                     {
+                        VeiculoHibridoPlugin hibrido = (VeiculoHibridoPlugin)novoVeiculo;
                         int.TryParse(txtAutonomia.Text, out int aut);
                         hibrido.AutonomiaEletrica = aut;
                     }
                 }
-                else if (novoVeiculo is VeiculoEletrico eletrico)
+                else if (novoVeiculo is VeiculoEletrico)
                 {
+                    VeiculoEletrico eletrico = (VeiculoEletrico)novoVeiculo;
                     double.TryParse(txtKwhBateria.Text, out double bat);
                     eletrico.KwhBateria = bat;
                 }
 
-                if (_veiculoSelecionado == null) _helper.Insert(novoVeiculo);
-                else _helper.Atualizar(novoVeiculo);
+                // Associa o Documento DAV se um ficheiro tiver sido selecionado
+                if (string.IsNullOrEmpty(_caminhoDavSelecionado) == false)
+                {
+                    Documento dav = new Documento();
+                    dav.TipoDocumento = "Declaração Aduaneira de Veículos (DAV)";
+                    dav.DataEmissao = DateTime.Now;
+                    dav.CaminhoFicheiro = _caminhoDavSelecionado;
+
+                    novoVeiculo.Documentos.Clear(); // Evita acumular duplicados na edição
+                    novoVeiculo.Documentos.Add(dav);
+                }
+
+                if (_veiculoSelecionado == null)
+                {
+                    _helper.Insert(novoVeiculo);
+                }
+                else
+                {
+                    _helper.Atualizar(novoVeiculo);
+                }
 
                 LimparFormulario();
                 AtualizarInterface();
@@ -157,36 +240,54 @@ namespace SLI_P2
             txtCustosTransporte.Text = _veiculoSelecionado.CustosTransporte.ToString("F2");
             chkIsImportacaoUe.IsChecked = _veiculoSelecionado.IsImportacaoUe;
 
-            // Determina index do tipo para forçar a atualização da ComboBox de combustível primeiro
-            if (_veiculoSelecionado is VeiculoMotociclo mota)
+            // Carrega o documento existente de forma clássica se houver
+            if (_veiculoSelecionado.Documentos.Count > 0)
             {
+                Documento docExistente = _veiculoSelecionado.Documentos[0];
+                _caminhoDavSelecionado = docExistente.CaminhoFicheiro;
+                lblCaminhoDav.Text = "DAV Anexada";
+                btnVerPdf.IsEnabled = true;
+            }
+            else
+            {
+                _caminhoDavSelecionado = "";
+                lblCaminhoDav.Text = "Nenhum ficheiro selecionado";
+                btnVerPdf.IsEnabled = false;
+            }
+
+            if (_veiculoSelecionado is VeiculoMotociclo)
+            {
+                VeiculoMotociclo mota = (VeiculoMotociclo)_veiculoSelecionado;
                 cbTipoVeiculo.SelectedIndex = 3;
                 txtCilindrada.Text = mota.Cilindrada.ToString();
             }
-            else if (_veiculoSelecionado is VeiculoHibridoPlugin hibrido)
+            else if (_veiculoSelecionado is VeiculoHibridoPlugin)
             {
+                VeiculoHibridoPlugin hibrido = (VeiculoHibridoPlugin)_veiculoSelecionado;
                 cbTipoVeiculo.SelectedIndex = 2;
                 txtCilindrada.Text = hibrido.Cilindrada.ToString();
                 txtCO2.Text = hibrido.EmissoesCO2.ToString();
                 txtParticulas.Text = hibrido.Particulas.ToString();
                 txtAutonomia.Text = hibrido.AutonomiaEletrica.ToString();
             }
-            else if (_veiculoSelecionado is VeiculoCombustao combustao)
+            else if (_veiculoSelecionado is VeiculoCombustao)
             {
+                VeiculoCombustao combustao = (VeiculoCombustao)_veiculoSelecionado;
                 cbTipoVeiculo.SelectedIndex = 0;
                 txtCilindrada.Text = combustao.Cilindrada.ToString();
                 txtCO2.Text = combustao.EmissoesCO2.ToString();
                 txtParticulas.Text = combustao.Particulas.ToString();
             }
-            else if (_veiculoSelecionado is VeiculoEletrico eletrico)
+            else if (_veiculoSelecionado is VeiculoEletrico)
             {
+                VeiculoEletrico eletrico = (VeiculoEletrico)_veiculoSelecionado;
                 cbTipoVeiculo.SelectedIndex = 1;
                 txtKwhBateria.Text = eletrico.KwhBateria.ToString();
             }
 
             cbTipoCombustivel.SelectedItem = _veiculoSelecionado.TipoCombustivel;
 
-            lblAvisoVeiculo.Text = $"{_veiculoSelecionado.Marca} {_veiculoSelecionado.Modelo}";
+            lblAvisoVeiculo.Text = _veiculoSelecionado.Marca + " " + _veiculoSelecionado.Modelo;
             panelAvisoEdicao.Visibility = Visibility.Visible;
             btnAdicionar.Content = "Atualizar Dados";
             btnEliminar.IsEnabled = true;
@@ -196,7 +297,7 @@ namespace SLI_P2
         {
             if (_veiculoSelecionado != null)
             {
-                var res = MessageBox.Show("Cancelar as alterações atuais?", "Confirmar", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                MessageBoxResult res = MessageBox.Show("Cancelar as alterações atuais?", "Confirmar", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (res == MessageBoxResult.No) return;
             }
             LimparFormulario();
@@ -206,7 +307,7 @@ namespace SLI_P2
         {
             if (_veiculoSelecionado != null)
             {
-                var res = MessageBox.Show("Remover este veículo da lista?", "Aviso", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                MessageBoxResult res = MessageBox.Show("Remover este veículo da lista?", "Aviso", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (res == MessageBoxResult.Yes)
                 {
                     _helper.Apagar(_veiculoSelecionado);
@@ -224,15 +325,51 @@ namespace SLI_P2
             lblMediaCustos.Text = _helper.ObterMediaCustosLegalizacao().ToString("N2") + " €";
             lblMediaCO2.Text = _helper.ObterMediaEmissoesCO2().ToString("F1") + " g/km";
 
-            int carros = App.lstVeiculos.Count(v => v is VeiculoCombustao || v is VeiculoEletrico);
-            int motas = App.lstVeiculos.Count(v => v is VeiculoMotociclo);
-            lblContadorTipos.Text = $"Carros: {carros} | Motas: {motas}";
+            int carros = 0;
+            int motas = 0;
+
+            foreach (Veiculo v in App.lstVeiculos)
+            {
+                if (v is VeiculoCombustao || v is VeiculoEletrico)
+                {
+                    carros++;
+                }
+                else if (v is VeiculoMotociclo)
+                {
+                    motas++;
+                }
+            }
+
+            lblContadorTipos.Text = "Carros: " + carros + " | Motas: " + motas;
+        }
+
+        private void btnVerPdf_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(_caminhoDavSelecionado))
+                {
+                    System.Diagnostics.ProcessStartInfo informacaoJanela = new System.Diagnostics.ProcessStartInfo();
+                    informacaoJanela.FileName = _caminhoDavSelecionado;
+                    informacaoJanela.UseShellExecute = true;
+
+                    System.Diagnostics.Process.Start(informacaoJanela);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Não foi possível abrir o PDF: " + ex.Message, "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void LimparFormulario()
         {
             _veiculoSelecionado = null;
+            _caminhoDavSelecionado = string.Empty;
+
             if (panelAvisoEdicao != null) panelAvisoEdicao.Visibility = Visibility.Collapsed;
+            if (lblCaminhoDav != null) lblCaminhoDav.Text = "Nenhum ficheiro selecionado";
+            if (btnVerPdf != null) btnVerPdf.IsEnabled = false;
 
             txtMarca.Clear(); txtModelo.Clear(); txtVin.Clear();
             txtAno.Text = "2026";

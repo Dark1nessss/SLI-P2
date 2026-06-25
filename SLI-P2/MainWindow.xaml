@@ -116,10 +116,35 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <Button x:Name="btnAdicionar" Content="Gravar" Grid.Row="0" Grid.Column="0" Margin="0,0,5,5" Height="32" Background="#3182CE" Foreground="White" FontWeight="Bold" Click="btnAdicionar_Click"/>
-                        <Button x:Name="btnLimpar" Content="Limpar" Grid.Row="0" Grid.Column="1" Margin="5,0,0,5" Height="32" Background="#E2E8F0" Click="btnLimpar_Click"/>
-                        <Button x:Name="btnEliminar" Content="Eliminar" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,5,0,0" Height="32" Background="#E53E3E" Foreground="White" FontWeight="Bold" Click="btnEliminar_Click"/>
+
+                        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,15">
+                            <Button Name="btnAnexarDav" 
+                                Content="Anexar Ficheiro DAV (PDF)" 
+                                Click="btnAnexarDav_Click" 
+                                Width="150" 
+                                Height="25"/>
+
+                            <Button Name="btnVerPdf"
+                                Content="👁️ Ver PDF" 
+                                Click="btnVerPdf_Click" 
+                                Width="80" 
+                                Height="25"
+                                Margin="5,0,0,0"
+                                IsEnabled="False"/>
+
+                            <TextBlock Name="lblCaminhoDav" 
+                                Text="Nenhum ficheiro selecionado" 
+                                Margin="10,0,0,0" 
+                                VerticalAlignment="Center" 
+                                FontStyle="Italic" 
+                                Foreground="Gray"/>
+                        </StackPanel>
+
+                        <Button x:Name="btnAdicionar" Content="Gravar" Grid.Row="1" Grid.Column="0" Margin="0,0,5,5" Height="32" Background="#3182CE" Foreground="White" FontWeight="Bold" Click="btnAdicionar_Click"/>
+                        <Button x:Name="btnLimpar" Content="Limpar" Grid.Row="1" Grid.Column="1" Margin="5,0,0,5" Height="32" Background="#E2E8F0" Click="btnLimpar_Click"/>
+                        <Button x:Name="btnEliminar" Content="Eliminar" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,5,0,0" Height="32" Background="#E53E3E" Foreground="White" FontWeight="Bold" Click="btnEliminar_Click"/>
                     </Grid>
                 </StackPanel>
             </ScrollViewer>

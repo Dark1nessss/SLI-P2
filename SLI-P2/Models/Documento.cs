@@ -11,6 +11,7 @@ namespace SLI_P2.Models
         private Guid _idDocumento;
         private string _tipoDocumento;
         private DateTime _dataEmissao;
+        private string _caminhoFicheiro;
 
         public Guid IdDocumento
         {
@@ -23,8 +24,9 @@ namespace SLI_P2.Models
             set
             {
                 _tipoDocumento = value.Trim();
-                if (_tipoDocumento.Length == 0) { 
-                    _tipoDocumento = "Declaração Aduaneira (DAV)"; 
+                if (_tipoDocumento.Length == 0)
+                {
+                    _tipoDocumento = "Declaração Aduaneira (DAV)";
                 }
             }
         }
@@ -35,11 +37,18 @@ namespace SLI_P2.Models
             set { _dataEmissao = value; }
         }
 
+        public string CaminhoFicheiro
+        {
+            get { return _caminhoFicheiro; }
+            set { _caminhoFicheiro = value; }
+        }
+
         public Documento()
         {
             _idDocumento = Guid.NewGuid();
             _tipoDocumento = "";
             _dataEmissao = DateTime.Now;
+            _caminhoFicheiro = "";
         }
     }
 }
