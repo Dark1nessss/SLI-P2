@@ -13,7 +13,14 @@ namespace SLI_P2.Models
         public int Cilindrada
         {
             get { return _cilindrada; }
-            set { _cilindrada = value < 0 ? 0 : value; }
+            set 
+            {
+                _cilindrada = value;
+                if (_cilindrada < 0)
+                {
+                    _cilindrada = 0;
+                }
+            }
         }
 
         public VeiculoMotociclo() : base()

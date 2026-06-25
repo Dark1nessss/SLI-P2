@@ -15,26 +15,47 @@ namespace SLI_P2.Models
         public int Cilindrada
         {
             get { return _cilindrada; }
-            set { _cilindrada = value < 0 ? 0 : value; }
+            set
+            {
+                _cilindrada = value;
+                if (_cilindrada < 0)
+                {
+                    _cilindrada = 0;
+                }
+            }
         }
 
         public int EmissoesCO2  
         {
             get { return _emissoesCO2; }
-            set { _emissoesCO2 = value < 0 ? 0 : value; }
+            set
+            {
+                _emissoesCO2 = value;
+                if (_emissoesCO2 < 0)
+                {
+                    _emissoesCO2 = 0;
+                }
+            }
         }
 
         public double Particulas
         {
             get { return _particulas; }
-            set { _particulas = value < 0 ? 0 : value; }
+            set 
+            {
+                _particulas = value;
+                if (_particulas < 0)
+                {
+                    _particulas = 0;
+                }
+            }
         }
 
         public VeiculoCombustao() : base()
         {
-            Cilindrada = 0;
-            EmissoesCO2 = 0;
-            Particulas = 0;
+            _cilindrada = 0;
+            _emissoesCO2 = 0;
+            _particulas = 0;
         }
 
         public override string ObterDescricaoTipo()

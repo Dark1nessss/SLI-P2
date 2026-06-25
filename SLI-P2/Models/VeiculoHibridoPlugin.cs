@@ -13,7 +13,14 @@ namespace SLI_P2.Models
         public int AutonomiaEletrica
         {
             get { return _autonomiaEletrica; }
-            set { _autonomiaEletrica = value < 0 ? 0 : value; }
+            set 
+            {
+                _autonomiaEletrica = value;
+                if (_autonomiaEletrica < 0)
+                {
+                    _autonomiaEletrica = 0;
+                }
+            }
         }
 
         public VeiculoHibridoPlugin() : base()

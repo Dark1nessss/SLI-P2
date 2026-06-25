@@ -11,6 +11,9 @@ namespace SLI_P2
     public partial class App : Application
     {
         public static List<Veiculo> lstVeiculos = new List<Veiculo>();
+        public static List<Processo> lstProcessos = new List<Processo>();
+        public static List<Alfandega> lstAlfandegas = new List<Alfandega>();
+        public static List<Contacto> lstContactos = new List<Contacto>();
     }
 
 }

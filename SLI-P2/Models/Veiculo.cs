@@ -18,6 +18,7 @@ namespace SLI_P2.Models
         private decimal _precoBase;
         private decimal _custosTransporte;
         private bool _isImportacaoUe;
+        private string _tipoVeiculo;
         private List<Documento> _documentos;
 
         public Guid IdVeiculo { get { return _idVeiculo; } }
@@ -113,23 +114,15 @@ namespace SLI_P2.Models
             set { _isImportacaoUe = value; }
         }
 
+        public string TipoVeiculo
+        {
+            get { return _tipoVeiculo; }
+            set { _tipoVeiculo = value; }
+        }
+
         public List<Documento> Documentos
         {
             get { return _documentos; }
-        }
-
-        public Veiculo()
-        {
-            _idVeiculo = Guid.NewGuid();
-            _vin = "";
-            _marca = "";
-            _modelo = "";
-            _ano = 2026;
-            _tipoCombustivel = "";
-            _precoBase = 0;
-            _custosTransporte = 0;
-            _isImportacaoUe = true;
-            _documentos = new List<Documento>();
         }
 
         public virtual decimal CalcularISV()
@@ -174,10 +167,40 @@ namespace SLI_P2.Models
             return 0.20m;
         }
 
-        public decimal ValorISV => CalcularISV();
-        public decimal ValorIVA => CalcularIVA();
-        public string DescricaoTipo => ObterDescricaoTipo();
-        public decimal DireitosAduaneiros => IsImportacaoUe ? 0m : PrecoBase * 0.10m;
-        public decimal CustoTotal => PrecoBase + CustosTransporte + ValorISV + ValorIVA + DireitosAduaneiros;
+        public decimal ValorISV()
+        { 
+            return CalcularISV(); 
+        }
+        public decimal ValorIVA()
+        { 
+            return CalcularIVA(); 
+        }
+        public string DescricaoTipo()
+        { 
+            return ObterDescricaoTipo(); 
+        }
+        public decimal DireitosAduaneiros()
+        {
+            if (IsImportacaoUe)
+            {
+                return 0m;
+            }
+            return PrecoBase * 0.10m;
+        }
+        public decimal CustoTotal() => PrecoBase + CustosTransporte + ValorISV() + ValorIVA() + DireitosAduaneiros();
+        public Veiculo()
+        {
+            _idVeiculo = Guid.NewGuid();
+            _vin = "";
+            _marca = "";
+            _modelo = "";
+            _ano = 2026;
+            _tipoCombustivel = "";
+            _precoBase = 0;
+            _custosTransporte = 0;
+            _isImportacaoUe = true;
+            _tipoVeiculo = "";
+            _documentos = new List<Documento>();
+        }
     }
 }

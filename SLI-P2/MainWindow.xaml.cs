@@ -20,11 +20,14 @@ namespace SLI_P2
         private SliHelper _helper = new SliHelper();
         private Veiculo _veiculoSelecionado = null;
         private string _caminhoDavSelecionado = string.Empty;
+        private ContactoHelper _contactoHelper = new ContactoHelper();
+        private Contacto _contactoSelecionado = null;
 
         public MainWindow()
         {
             InitializeComponent();
             cbTipoVeiculo.SelectedIndex = 0;
+            cbAtributoEspecifico.IsEnabled = false;
             AtualizarInterface();
         }
 
@@ -398,6 +401,190 @@ namespace SLI_P2
             txtMarca.Text = "Yamaha"; txtModelo.Text = "XVS 950 Midnight Star"; txtVin.Text = "JYAVN02100001234";
             txtAno.Text = "2015"; txtPrecoBase.Text = "6200"; txtCustosTransporte.Text = "300";
             chkIsImportacaoUe.IsChecked = true; txtCilindrada.Text = "942";
+        }
+
+        // -------------------------- Contacto ----------------------------------------
+
+        private void cbTipoContacto_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cbTipoContacto.SelectedIndex != -1)
+            {
+
+                cbAtributoEspecifico.IsEnabled = true;
+                cbAtributoEspecifico.Items.Clear();
+
+                if (cbTipoContacto.SelectedIndex == 0) // Comprador
+                {
+                    lblAtributoEspecifico.Text = "Tipo de Cliente:";
+                    cbAtributoEspecifico.Items.Add("Particular");
+                    cbAtributoEspecifico.Items.Add("Empresa");
+                    cbAtributoEspecifico.Items.Add("Stand");
+                }
+                else // Vendedor
+                {
+                    lblAtributoEspecifico.Text = "Stand Comercial:";
+                    cbAtributoEspecifico.Items.Add("Stand Local");
+                    cbAtributoEspecifico.Items.Add("Concessionário");
+                    cbAtributoEspecifico.Items.Add("Importador Direto");
+                }
+                cbAtributoEspecifico.SelectedIndex = 0;
+            }
+            else
+            {
+                cbAtributoEspecifico.IsEnabled = false;
+            }
+        }
+
+        private void btnGravarContacto_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtNomeContacto.Text) || string.IsNullOrWhiteSpace(txtNifContacto.Text))
+            {
+                MessageBox.Show("Por favor, preencha o Nome e o NIF do contacto.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            bool isNovo = (_contactoSelecionado == null);
+            Contacto contactoTratado;
+
+            if (isNovo)
+            {
+                if (cbTipoContacto.SelectedIndex == 0)
+                {
+                    contactoTratado = new Comprador();
+                }
+                else
+                {
+                    contactoTratado = new Vendedor();
+                }
+            }
+            else
+            {
+                contactoTratado = _contactoSelecionado;
+            }
+
+            contactoTratado.Nome = txtNomeContacto.Text;
+            contactoTratado.NIF = txtNifContacto.Text;
+
+            if (contactoTratado is Comprador comprador)
+            {
+                comprador.TipoCliente = cbAtributoEspecifico.Text;
+            }
+            else if (contactoTratado is Vendedor vendedor)
+            {
+                vendedor.StandComercial = cbAtributoEspecifico.Text;
+            }
+
+            if (isNovo)
+            {
+                _contactoHelper.Insert(contactoTratado);
+                MessageBox.Show("Contacto registado com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                _contactoHelper.Atualizar(contactoTratado);
+                MessageBox.Show("Contacto atualizado com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+
+            AtualizarInterfaceContactos();
+            LimparFormularioContacto();
+        }
+
+        private void lvContactos_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _contactoSelecionado = lvContactos.SelectedItem as Contacto;
+
+            if (_contactoSelecionado != null)
+            {
+                txtNomeContacto.Text = _contactoSelecionado.Nome;
+                txtNifContacto.Text = _contactoSelecionado.NIF;
+
+                if (_contactoSelecionado is Comprador comprador)
+                {
+                    cbTipoContacto.SelectedIndex = 0;
+                    cbAtributoEspecifico.Text = comprador.TipoCliente;
+                }
+                else if (_contactoSelecionado is Vendedor vendedor)
+                {
+                    cbTipoContacto.SelectedIndex = 1;
+                    cbAtributoEspecifico.Text = vendedor.StandComercial;
+                }
+
+                btnGravarContacto.Content = "Atualizar";
+                btnEliminarContacto.IsEnabled = true;
+                cbTipoContacto.IsEnabled = false;
+            }
+        }
+
+        private void btnEliminarContacto_Click(object sender, RoutedEventArgs e)
+        {
+            if (_contactoSelecionado != null)
+            {
+                var confirmacao = MessageBox.Show($"Tem a certeza que deseja eliminar o contacto {_contactoSelecionado.Nome}?",
+                    "Confirmar Exclusão", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (confirmacao == MessageBoxResult.Yes)
+                {
+                    _contactoHelper.Apagar(_contactoSelecionado);
+                    AtualizarInterfaceContactos();
+                    LimparFormularioContacto();
+                }
+            }
+        }
+
+        private void btnLimparContacto_Click(object sender, RoutedEventArgs e)
+        {
+            LimparFormularioContacto();
+        }
+
+        private void AtualizarInterfaceContactos()
+        {
+            lvContactos.ItemsSource = null;
+            lvContactos.ItemsSource = App.lstContactos;
+        }
+
+        private void LimparFormularioContacto()
+        {
+            txtNomeContacto.Clear();
+            txtNifContacto.Clear();
+            cbAtributoEspecifico.Text = "";
+            cbTipoContacto.SelectedIndex = 0;
+            cbTipoContacto.IsEnabled = true;
+
+            btnGravarContacto.Content = "Gravar";
+            btnEliminarContacto.IsEnabled = false;
+            _contactoSelecionado = null;
+            lvContactos.SelectedItem = null;
+        }
+
+        // -------------------------- Processos ----------------------------------------
+
+        private void CarregarProcessos()
+        {
+            cbProcVeiculo.ItemsSource = App.lstVeiculos;
+            cbProcContacto.ItemsSource = App.lstContactos;
+            cbProcAlfandega.ItemsSource = App.lstAlfandegas;
+
+            dgProcessos.ItemsSource = null;
+            dgProcessos.ItemsSource = App.lstProcessos;
+        }
+
+        // Evento do botão
+        private void btnCriarProcesso_Click(object sender, RoutedEventArgs e)
+        {
+            if (cbProcVeiculo.SelectedItem == null || cbProcContacto.SelectedItem == null)
+            {
+                MessageBox.Show("Selecione veículo e contacto!");
+                return;
+            }
+
+            Processo p = new Processo();
+            p.VeiculoAssociado = (Veiculo)cbProcVeiculo.SelectedItem;
+            p.ContactoAssociado = (Contacto)cbProcContacto.SelectedItem;
+            p.AlfandegaDestino = (Alfandega)cbProcAlfandega.SelectedItem;
+            p.Estado = "Pendente";
+
+            App.lstProcessos.Add(p);
+            CarregarProcessos();
         }
     }
 }
