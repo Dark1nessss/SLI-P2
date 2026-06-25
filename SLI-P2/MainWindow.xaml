@@ -1,0 +1,197 @@
+﻿<Window x:Class="SLI_P2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SLI_P2"
+        mc:Ignorable="d"
+        Title="SLI - Sistema de Legalização e Importação" Height="760" Width="1150" 
+        WindowStartupLocation="CenterScreen" Background="#F0F2F5">
+
+    <Grid Margin="15">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="350"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="White" CornerRadius="8" Padding="15" Margin="0,0,12,0">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" Color="#D3D3D3" Opacity="0.4" ShadowDepth="2"/>
+            </Border.Effect>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="Registo de Veículo" FontSize="20" FontWeight="Bold" Foreground="#1A202C" Margin="0,0,0,5"/>
+
+                    <Label Content="Presets Rápidos de Teste:" FontSize="11" Foreground="#718096" Padding="0"/>
+                    <Grid Margin="0,2,0,15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="btnPresetCarro" Content="⚡ Exemplo Carro" Grid.Column="0" Margin="0,0,4,0" Height="26" Background="#EDF2F7" Click="btnPresetCarro_Click" FontSize="11"/>
+                        <Button x:Name="btnPresetMota" Content="🏍️ Exemplo Mota" Grid.Column="1" Margin="4,0,0,0" Height="26" Background="#EDF2F7" Click="btnPresetMota_Click" FontSize="11"/>
+                    </Grid>
+
+                    <Separator Margin="0,0,0,10"/>
+
+                    <Label Content="Tipo de Veículo:" FontWeight="SemiBold"/>
+                    <ComboBox x:Name="cbTipoVeiculo" Margin="0,0,0,10" Height="28" SelectionChanged="cbTipoVeiculo_SelectionChanged">
+                        <ComboBoxItem Content="Carro: Combustão Puro"/>
+                        <ComboBoxItem Content="Carro: 100% Elétrico (EV)"/>
+                        <ComboBoxItem Content="Carro: Híbrido Plug-In (PHEV)"/>
+                        <ComboBoxItem Content="Motociclo (Mota)"/>
+                    </ComboBox>
+
+                    <Label Content="Marca:" FontWeight="SemiBold"/>
+                    <TextBox x:Name="txtMarca" Margin="0,0,0,10" Height="24"/>
+
+                    <Label Content="Modelo:" FontWeight="SemiBold"/>
+                    <TextBox x:Name="txtModelo" Margin="0,0,0,10" Height="24"/>
+
+                    <Label Content="Nº de Chassis (VIN):" FontWeight="SemiBold"/>
+                    <TextBox x:Name="txtVin" Margin="0,0,0,10" Height="24"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                            <Label Content="Ano:" FontWeight="SemiBold"/>
+                            <TextBox x:Name="txtAno" Margin="0,0,0,10" Height="24"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                            <Label Content="Combustível:" FontWeight="SemiBold"/>
+                            <ComboBox x:Name="cbTipoCombustivel" Margin="0,0,0,10" Height="24"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                            <Label Content="Preço Base (€):" FontWeight="SemiBold"/>
+                            <TextBox x:Name="txtPrecoBase" Margin="0,0,0,10" Height="24"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                            <Label Content="Transporte (€):" FontWeight="SemiBold"/>
+                            <TextBox x:Name="txtCustosTransporte" Margin="0,0,0,10" Height="24"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <CheckBox x:Name="chkIsImportacaoUe" Content="Importação UE (Isento de IVA)" IsChecked="True" Margin="0,5,0,15" FontWeight="SemiBold" Foreground="#2B6CB0"/>
+
+                    <Separator Margin="0,0,0,10"/>
+
+                    <StackPanel x:Name="panelCilindrada" Visibility="Visible">
+                        <Label Content="Cilindrada (cc):" FontWeight="SemiBold"/>
+                        <TextBox x:Name="txtCilindrada" Margin="0,0,0,10" Height="24"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="panelAmbiental" Visibility="Visible">
+                        <Label Content="CO2 (g/km):" FontWeight="SemiBold"/>
+                        <TextBox x:Name="txtCO2" Margin="0,0,0,10" Height="24"/>
+                        <Label Content="Partículas Diesel (g/km):" FontWeight="SemiBold"/>
+                        <TextBox x:Name="txtParticulas" Margin="0,0,0,10" Height="24" Text="0"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="panelHibrido" Visibility="Collapsed">
+                        <Label Content="Autonomia Elétrica (km):" FontWeight="SemiBold"/>
+                        <TextBox x:Name="txtAutonomia" Margin="0,0,0,10" Height="24"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="panelEletrico" Visibility="Collapsed">
+                        <Label Content="Capacidade Bateria (kWh):" FontWeight="SemiBold"/>
+                        <TextBox x:Name="txtKwhBateria" Margin="0,0,0,10" Height="24"/>
+                    </StackPanel>
+
+                    <Grid Margin="0,15,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Button x:Name="btnAdicionar" Content="Gravar" Grid.Row="0" Grid.Column="0" Margin="0,0,5,5" Height="32" Background="#3182CE" Foreground="White" FontWeight="Bold" Click="btnAdicionar_Click"/>
+                        <Button x:Name="btnLimpar" Content="Limpar" Grid.Row="0" Grid.Column="1" Margin="5,0,0,5" Height="32" Background="#E2E8F0" Click="btnLimpar_Click"/>
+                        <Button x:Name="btnEliminar" Content="Eliminar" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,5,0,0" Height="32" Background="#E53E3E" Foreground="White" FontWeight="Bold" Click="btnEliminar_Click"/>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <Grid Grid.Column="1" Margin="10,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Background="White" CornerRadius="8" Padding="10" Margin="0,0,0,15">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Lista de Veículos no Processo de Legalização" FontSize="16" FontWeight="Bold" Margin="5,5,0,10" Foreground="#2D3748"/>
+
+                    <Border x:Name="panelAvisoEdicao" Grid.Row="1" Background="#EBF8FF" BorderBrush="#BEE3F8" BorderThickness="1" CornerRadius="6" Padding="10" Margin="5,0,5,10" Visibility="Collapsed">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                <TextBlock Text="✏️ A ser modificado:" FontWeight="Bold" Foreground="#2B6CB0" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="lblAvisoVeiculo" Text=" Marca Modelo" Foreground="#2D3748" FontWeight="SemiBold" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <Button Content="Descartar Alterações" Grid.Column="1" Background="Transparent" BorderThickness="0" Foreground="#E53E3E" FontWeight="Bold" Cursor="Hand" Click="btnLimpar_Click" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <ListView x:Name="lvVeiculos" Grid.Row="2" SelectionChanged="lvVeiculos_SelectionChanged" BorderThickness="0">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Tipo" DisplayMemberBinding="{Binding DescricaoTipo}" Width="130"/>
+                                <GridViewColumn Header="Marca" DisplayMemberBinding="{Binding Marca}" Width="90"/>
+                                <GridViewColumn Header="Modelo" DisplayMemberBinding="{Binding Modelo}" Width="100"/>
+                                <GridViewColumn Header="Ano" DisplayMemberBinding="{Binding Ano}" Width="55"/>
+                                <GridViewColumn Header="ISV" DisplayMemberBinding="{Binding ValorISV, StringFormat={}{0:N2} €}" Width="95"/>
+                                <GridViewColumn Header="IVA" DisplayMemberBinding="{Binding ValorIVA, StringFormat={}{0:N2} €}" Width="95"/>
+                                <GridViewColumn Header="Custo Total" DisplayMemberBinding="{Binding CustoTotal, StringFormat={}{0:N2} €}" Width="115"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="15">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                        <TextBlock Text="Média Global de Impostos" Foreground="#A0AEC0" FontSize="11" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="lblMediaCustos" Text="0,00 €" Foreground="#48BB78" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                        <TextBlock Text="Média CO2 (Apenas Carros)" Foreground="#A0AEC0" FontSize="11" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="lblMediaCO2" Text="0.0 g/km" Foreground="#ECC94B" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                        <TextBlock Text="Frota Cadastrada" Foreground="#A0AEC0" FontSize="11" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="lblContadorTipos" Text="Carros: 0 | Motas: 0" Foreground="#63B3ED" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,7,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
